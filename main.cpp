@@ -1,27 +1,9 @@
 #include "raylib.h"
 #include "textAlign.h"
+#include "window_utils.h"
 #include "resources/NHG_LIGHT.h"
 #include "resources/NHG_MEDIUM.h"
 
-#ifdef _WIN32 // Windows API for rounded corners
-    typedef int WINBOOL;
-    typedef void* HWND;
-    typedef long HRESULT;
-
-    extern "C" {
-        HWND FindWindowA(const char* lpClassName, const char* lpWindowName);
-        HRESULT DwmSetWindowAttribute(HWND hwnd, unsigned long dwAttribute, const void* pvAttribute, unsigned long cbAttribute);
-    }
-
-    #define DWMWA_WINDOW_CORNER_PREFERENCE 33
-
-    enum DWM_WINDOW_CORNER_PREFERENCE {
-        DWMWCP_DEFAULT      = 0,
-        DWMWCP_DONOTROUND   = 1,
-        DWMWCP_ROUND        = 2,
-        DWMWCP_ROUNDSMALL   = 3
-    };
-#endif // _WIN32
 
 #define NATIVE_WIDTH 1600
 #define NATIVE_HEIGHT 800
@@ -38,13 +20,7 @@ int main(void) {
     InitWindow(NATIVE_WIDTH, NATIVE_HEIGHT, "Molar Mass Calculator");
     SetTargetFPS(60);
 
-    #ifdef _WIN32
-    HWND hwnd = FindWindowA(nullptr, "Molar Mass Calculator");
-    if (hwnd) {
-        DWM_WINDOW_CORNER_PREFERENCE preference = DWMWCP_ROUND;
-        DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, &preference, sizeof(preference));
-    }
-    #endif
+    SetWindowRoundedCorners("Molar Mass Calculator");
 
     loadFonts();
 
