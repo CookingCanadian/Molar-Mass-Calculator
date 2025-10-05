@@ -2,16 +2,14 @@
 #include "text_align.h"
 #include "window_utils.h"
 #include "ui_context.h"
-#include "resources/NHG_LIGHT.h"
-#include "resources/NHG_MEDIUM.h"
+#include "resources/ROBOTO_REGULAR.h"
 
 #define NATIVE_WIDTH 1600
 #define NATIVE_HEIGHT 800
 #define MIN_WIDTH 400
 #define MAX_WIDTH 1600
 
-Font NHG_LIGHT;
-Font NHG_MEDIUM;
+Font ROBOTO_REGULAR;
 
 void loadFonts();
 
@@ -44,26 +42,27 @@ int main(void) {
             DrawRectangle(0, (int)ui.Y(60), (int)ui.S(400), (int)ui.GetHeight() - ui.Y(60), (Color){39, 42, 47, 200}); // history backing
             DrawLine((int)ui.X(400), (int)ui.Y(60), (int)ui.X(400), (int)ui.GetHeight(), (Color){58, 62, 66, 255}); // history divider line
 
-            DrawRectangleRounded((Rectangle){ui.X(600), ui.Y(350), ui.S(800), ui.S(100)}, 0.24f, 10, (Color){151, 172, 169, 255}); // search box background
+            DrawRectangleRounded((Rectangle){ui.X(600), ui.Y(350), ui.S(800), ui.S(100)}, 0.24f, 8, (Color){151, 172, 169, 255}); // search box background
+            DrawRectangleRounded((Rectangle){ui.X(1360), ui.Y(410), ui.S(30), ui.S(30)}, 0.4f, 6, (Color){48, 177, 146, 255}); // calculate icon
+            DrawTextAligned(ROBOTO_REGULAR, "=", (Rectangle){ui.X(1360), ui.Y(410), ui.S(30), ui.S(30)}, 24.0f, 0.0f, WHITE, HorizontalAlign::Center, VerticalAlign::Middle); // replace w/ NHG_REGULAR sometime in the future
             
-            DrawTextAlignedAt(NHG_MEDIUM, "Molar Mass Calculator", ui.X(20), ui.Y(30), ui.S(30), 0.0f, GRAY, HorizontalAlign::Left, VerticalAlign::Middle);
+            
+            DrawTextAlignedAt(ROBOTO_REGULAR, "Molar Mass Calculator", ui.X(20), ui.Y(30), ui.S(30), 0.0f, GRAY, HorizontalAlign::Left, VerticalAlign::Middle);
             
         EndDrawing();
     }
     
-    UnloadFont(NHG_LIGHT);
-    UnloadFont(NHG_MEDIUM);
+    UnloadFont(ROBOTO_REGULAR);
     CloseWindow();
     return 0;
 }
 
 void loadFonts() {
-    NHG_LIGHT = LoadFontFromMemory(".ttf", font_data_light, sizeof(font_data_light), 60, nullptr, 0);
-    NHG_MEDIUM = LoadFontFromMemory(".ttf", font_data_medium, sizeof(font_data_medium), 60, nullptr, 0);
+    ROBOTO_REGULAR = LoadFontFromMemory(".ttf", font_data_regular, sizeof(font_data_regular), 40, nullptr, 0);
 
-    SetTextureFilter(NHG_LIGHT.texture, TEXTURE_FILTER_BILINEAR);
-    SetTextureFilter(NHG_MEDIUM.texture, TEXTURE_FILTER_BILINEAR);
 
-    GenTextureMipmaps(&NHG_LIGHT.texture);
-    GenTextureMipmaps(&NHG_MEDIUM.texture);
+    SetTextureFilter(ROBOTO_REGULAR.texture, TEXTURE_FILTER_BILINEAR);
+
+
+    GenTextureMipmaps(&ROBOTO_REGULAR.texture);
 }

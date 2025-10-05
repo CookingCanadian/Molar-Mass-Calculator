@@ -14,7 +14,11 @@ void DrawTextAligned(Font font, const char* text, Rectangle bounds, // rectangle
     }
 
     switch (vAlign) {
-        case VerticalAlign::Middle: pos.y += (bounds.height - textSize.y) / 2.0f - fontSize * 0.1f; break;
+        case VerticalAlign::Middle: {    
+            float capHeight = fontSize * 1.0f;  
+            pos.y += (bounds.height - capHeight) / 2.0f;
+            break;
+        }
         case VerticalAlign::Bottom: pos.y += bounds.height - textSize.y; break;
         default: break;
     }
