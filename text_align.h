@@ -1,5 +1,4 @@
-#ifndef TEXTALIGN_H
-#define TEXTALIGN_H
+#pragma once
 
 #include "raylib.h"
 
@@ -22,5 +21,3 @@ void DrawTextAligned(Font font, const char* text, Rectangle bounds, // in boundi
 void DrawTextAlignedAt(Font font, const char* text, float x, float y, // via x, y
                        float fontSize, float spacing, Color color,
                        HorizontalAlign hAlign, VerticalAlign vAlign);
-
-#endif // TEXTALIGN_H

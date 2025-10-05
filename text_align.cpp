@@ -1,4 +1,4 @@
-#include "TextAlign.h"
+#include "text_align.h"
 
 void DrawTextAligned(Font font, const char* text, Rectangle bounds, // rectangle bounding alignment
                      float fontSize, float spacing, Color color,

@@ -12,8 +12,7 @@
 
                 "-I", "C:/raylib/raylib/src",
 
-                "${workspaceFolder}/main.cpp",
-                "${workspaceFolder}/textAlign.cpp",
+                "${workspaceFolder}/*.cpp",
 
                 "-L", "C:/raylib/raylib/src",
                 "-lraylib",
