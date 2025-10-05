@@ -1,9 +1,8 @@
-import sys
 import os
 
-ttf_path = ""
-file_name = ""
-array_name = ""
+ttf_path = "NotoSansSymbols2-Regular.ttf"
+file_name = "NOTO_SYMBOLS"
+array_name = "font_data_symbol"
 header_path = file_name + ".h"
 
 

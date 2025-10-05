@@ -1,15 +1,22 @@
+#include <cstdlib>
 #include "raylib.h"
+#include "rlgl.h"
 #include "text_align.h"
 #include "window_utils.h"
 #include "ui_context.h"
+#include "resources/NOTO_SYMBOLS.h"
 #include "resources/ROBOTO_REGULAR.h"
+#include "resources/ROBOTO_MEDIUM.h"
 
 #define NATIVE_WIDTH 1600
 #define NATIVE_HEIGHT 800
 #define MIN_WIDTH 400
 #define MAX_WIDTH 1600
 
+Font NOTO_SYMBOLS;
+
 Font ROBOTO_REGULAR;
+Font ROBOTO_MEDIUM;
 
 void loadFonts();
 
@@ -44,25 +51,70 @@ int main(void) {
 
             DrawRectangleRounded((Rectangle){ui.X(600), ui.Y(350), ui.S(800), ui.S(100)}, 0.24f, 8, (Color){151, 172, 169, 255}); // search box background
             DrawRectangleRounded((Rectangle){ui.X(1360), ui.Y(410), ui.S(30), ui.S(30)}, 0.4f, 6, (Color){48, 177, 146, 255}); // calculate icon
-            DrawTextAligned(ROBOTO_REGULAR, "=", (Rectangle){ui.X(1360), ui.Y(410), ui.S(30), ui.S(30)}, 24.0f, 0.0f, WHITE, HorizontalAlign::Center, VerticalAlign::Middle); // replace w/ NHG_REGULAR sometime in the future
-            
-            
-            DrawTextAlignedAt(ROBOTO_REGULAR, "Molar Mass Calculator", ui.X(20), ui.Y(30), ui.S(30), 0.0f, GRAY, HorizontalAlign::Left, VerticalAlign::Middle);
+            DrawTextAligned(NOTO_SYMBOLS, "➤", (Rectangle){ui.X(1360), ui.Y(410), ui.S(30), ui.S(30)}, 24.0f, 0.0f, WHITE, HorizontalAlign::Center, VerticalAlign::Middle); // replace w/ NHG_REGULAR sometime in the future
+            DrawRectangleRounded((Rectangle){ui.X(1250), ui.Y(410), ui.S(100), ui.S(30)}, 0.4f, 6, (Color){125, 145, 142, 255}); // decimal place
+            DrawTextAligned(ROBOTO_REGULAR, "0.01 C₀₁", (Rectangle){ui.X(1260), ui.Y(410), ui.S(80), ui.S(30)}, 24.0f, 0.0f, WHITE, HorizontalAlign::Left, VerticalAlign::Middle);
+            DrawTextAligned(NOTO_SYMBOLS, "▼", (Rectangle){ui.X(1260), ui.Y(410), ui.S(80), ui.S(30)}, 24.0f, 0.0f, WHITE, HorizontalAlign::Right, VerticalAlign::Middle);
+
+            DrawTextAlignedAt(ROBOTO_MEDIUM, "Molar Mass Calculator", ui.X(20), ui.Y(30), ui.S(30), 0.0f, GRAY, HorizontalAlign::Left, VerticalAlign::Middle);
             
         EndDrawing();
     }
     
     UnloadFont(ROBOTO_REGULAR);
+    UnloadFont(ROBOTO_MEDIUM);
     CloseWindow();
     return 0;
 }
 
 void loadFonts() {
-    ROBOTO_REGULAR = LoadFontFromMemory(".ttf", font_data_regular, sizeof(font_data_regular), 40, nullptr, 0);
+    // Noto Symbols: ASCII + arrows/symbols only
+    int notoAsciiCount = 95;
+    int notoSymbols = 2; // ➤ and ▼
+    int notoTotalCount = notoAsciiCount + notoSymbols;
+    
+    int *notoCodepoints = (int *)malloc(notoTotalCount * sizeof(int));
+    
+    // ASCII printable characters (32-126)
+    for (int i = 0; i < notoAsciiCount; i++) {
+        notoCodepoints[i] = 32 + i;
+    }
+    
+    // Extra symbols for Noto
+    notoCodepoints[notoAsciiCount + 0] = 0x27A4; // ➤ right arrow
+    notoCodepoints[notoAsciiCount + 1] = 0x25BC; // ▼ down triangle
+    
+    NOTO_SYMBOLS = LoadFontFromMemory(".ttf", font_data_symbol, sizeof(font_data_symbol), 40, notoCodepoints, notoTotalCount);
+    
+    free(notoCodepoints);
+    
+    // Roboto: ASCII + subscripts only
+    int robotoAsciiCount = 95;
+    int subscriptCount = 10;
+    int robotoTotalCount = robotoAsciiCount + subscriptCount;
+    
+    int *robotoCodepoints = (int *)malloc(robotoTotalCount * sizeof(int));
+    
+    // ASCII printable characters (32-126)
+    for (int i = 0; i < robotoAsciiCount; i++) {
+        robotoCodepoints[i] = 32 + i;
+    }
+    
+    // Subscript digits (U+2080 to U+2089): ₀₁₂₃₄₅₆₇₈₉
+    for (int i = 0; i < subscriptCount; i++) {
+        robotoCodepoints[robotoAsciiCount + i] = 0x2080 + i;
+    }
+    
+    ROBOTO_REGULAR = LoadFontFromMemory(".ttf", font_data_regular, sizeof(font_data_regular), 40, robotoCodepoints, robotoTotalCount);
+    ROBOTO_MEDIUM = LoadFontFromMemory(".ttf", font_data_medium, sizeof(font_data_medium), 40, robotoCodepoints, robotoTotalCount);
+    
+    free(robotoCodepoints);
 
-
+    SetTextureFilter(NOTO_SYMBOLS.texture, TEXTURE_FILTER_BILINEAR);
     SetTextureFilter(ROBOTO_REGULAR.texture, TEXTURE_FILTER_BILINEAR);
+    SetTextureFilter(ROBOTO_MEDIUM.texture, TEXTURE_FILTER_BILINEAR);
 
-
+    GenTextureMipmaps(&NOTO_SYMBOLS.texture);
     GenTextureMipmaps(&ROBOTO_REGULAR.texture);
+    GenTextureMipmaps(&ROBOTO_MEDIUM.texture);
 }
