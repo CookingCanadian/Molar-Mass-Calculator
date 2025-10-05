@@ -80,7 +80,7 @@ void loadFonts() {
         notoCodepoints[i] = 32 + i;
     }
     
-    // Extra symbols for Noto
+    // extra symbols for Noto
     notoCodepoints[notoAsciiCount + 0] = 0x27A4; // ➤ right arrow
     notoCodepoints[notoAsciiCount + 1] = 0x25BC; // ▼ down triangle
     
@@ -88,7 +88,6 @@ void loadFonts() {
     
     free(notoCodepoints);
     
-    // Roboto: ASCII + subscripts only
     int robotoAsciiCount = 95;
     int subscriptCount = 10;
     int robotoTotalCount = robotoAsciiCount + subscriptCount;
@@ -100,7 +99,7 @@ void loadFonts() {
         robotoCodepoints[i] = 32 + i;
     }
     
-    // Subscript digits (U+2080 to U+2089): ₀₁₂₃₄₅₆₇₈₉
+    // subscript digits (U+2080 to U+2089): ₀₁₂₃₄₅₆₇₈₉
     for (int i = 0; i < subscriptCount; i++) {
         robotoCodepoints[robotoAsciiCount + i] = 0x2080 + i;
     }
