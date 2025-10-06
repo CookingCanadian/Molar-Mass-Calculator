@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cstdio>
 #include "raylib.h"
 #include "rlgl.h"
 #include "text_align.h"
@@ -16,6 +17,8 @@
 
 #define TEXT_LIGHT (Color){225, 244, 242, 255}
 #define TEXT_DARK (Color){71, 83, 82, 255}
+#define BUTTON_NORMAL (Color){125, 145, 142, 255}
+#define BUTTON_HOVER (Color){105, 125, 122, 255}
 
 Font NOTO_SYMBOLS;
 
@@ -36,17 +39,49 @@ int main(void) {
     
     ui.SetResizeHandle(NATIVE_WIDTH - 20, NATIVE_HEIGHT - 20, 8.0f);
     ui.SetTopBar(60);
-    
+
     loadFonts();
-    
+
     while (!WindowShouldClose()) {
         ui.Update();        
         
         BeginDrawing();
+            // button coordinates
+            Rectangle calculateBtn = {ui.X(1360), ui.Y(410), ui.S(30), ui.S(30)};
+            Rectangle decimalBtn = {ui.X(1250), ui.Y(410), ui.S(100), ui.S(30)};
+            Rectangle subscriptBtn = {ui.X(610), ui.Y(410), ui.S(30), ui.S(30)};
+            Rectangle clearBtn = {ui.X(650), ui.Y(410), ui.S(70), ui.S(30)};
+            // button bindings
+            ui.AddElement(calculateBtn, []() {
+                printf("calculate pressed\n");
+            });
+            ui.AddElement(decimalBtn, []() {
+                printf("decimal pressed\n");
+            });
+            ui.AddElement(subscriptBtn, []() {
+                printf("subscript pressed\n");
+            });
+            ui.AddElement(clearBtn, []() {
+                printf("clear pressed\n");
+            });
+            // hover bindings
+            Color calculateBtnClr = (ui.IsMouseOver(calculateBtn))
+            ? (Color){28, 157, 126, 255}   // hover
+            : (Color){48, 177, 146, 255}; // normal
+            Color decimalBtnClr = (ui.IsMouseOver(decimalBtn))
+            ? BUTTON_HOVER 
+            : BUTTON_NORMAL; 
+            Color subscriptBtnClr = (ui.IsMouseOver(subscriptBtn))
+            ? BUTTON_HOVER   
+            : BUTTON_NORMAL; 
+            Color clearBtnClr = (ui.IsMouseOver(clearBtn))
+            ? BUTTON_HOVER   
+            : BUTTON_NORMAL; 
+
             ClearBackground((Color){41, 44, 49, 255});
 
             DrawRectangle(0, 0, (int)ui.GetWidth(), (int)ui.S(60), (Color){31, 34, 39, 255}); // top bar
-
+            
             DrawRectangleGradientV(0, (int)ui.GetHeight() - ui.Y(600), (int)ui.GetWidth(), (int)ui.Y(600), (Color){0, 255, 197, 0}, (Color){0, 255, 197, 20}); // background gradient
 
             DrawCircle((int)ui.GetWidth() - ui.X(20), (int)ui.GetHeight() - ui.Y(20), ui.S(8.0f), (Color){31, 43, 41, 255}); // resize circle
@@ -55,25 +90,24 @@ int main(void) {
             DrawLine((int)ui.X(400), (int)ui.Y(60), (int)ui.X(400), (int)ui.GetHeight(), (Color){58, 62, 66, 255}); // history divider line
 
             DrawRectangleRounded((Rectangle){ui.X(600), ui.Y(350), ui.S(800), ui.S(100)}, 0.24f, 8, (Color){151, 172, 169, 255}); // search box background
-            DrawRectangleRounded((Rectangle){ui.X(1360), ui.Y(410), ui.S(30), ui.S(30)}, 0.4f, 6, (Color){48, 177, 146, 255}); // calculate background button
-            DrawTextAligned(NOTO_SYMBOLS, "➤", (Rectangle){ui.X(1360), ui.Y(411), ui.S(30), ui.S(30)}, ui.S(32), 0.0f, TEXT_LIGHT, HorizontalAlign::Center, VerticalAlign::Middle); // calculate icon
+            DrawRectangleRounded(calculateBtn, 0.4f, 6, calculateBtnClr); // calculate background button
+            DrawTextAligned(NOTO_SYMBOLS, "➤", calculateBtn, ui.S(32), 0.0f, TEXT_LIGHT, HorizontalAlign::Center, VerticalAlign::Middle); // calculate icon
             
-            DrawRectangleRounded((Rectangle){ui.X(1250), ui.Y(410), ui.S(100), ui.S(30)}, 0.4f, 6, (Color){125, 145, 142, 255}); // decimal place adjust button
-            DrawTextAligned(ROBOTO_MEDIUM, "0.01", (Rectangle){ui.X(1260), ui.Y(410), ui.S(80), ui.S(30)}, ui.S(20), 0.0f, TEXT_DARK, HorizontalAlign::Left, VerticalAlign::Middle); 
-            DrawTextAligned(NOTO_SYMBOLS, "▼", (Rectangle){ui.X(1260), ui.Y(410), ui.S(80), ui.S(30)}, ui.S(24), 0.0f, TEXT_DARK, HorizontalAlign::Right, VerticalAlign::Bottom);
+            DrawRectangleRounded(decimalBtn, 0.4f, 6, decimalBtnClr); // decimal place adjust button
+            DrawTextAligned(ROBOTO_MEDIUM, "\t0.01", decimalBtn, ui.S(20), 0.0f, TEXT_DARK, HorizontalAlign::Left, VerticalAlign::Middle); 
+            DrawTextAligned(NOTO_SYMBOLS, "▼\t", decimalBtn, ui.S(24), 0.0f, TEXT_DARK, HorizontalAlign::Right, VerticalAlign::Bottom);
 
-            DrawRectangleRounded((Rectangle){ui.X(610), ui.Y(410), ui.S(30), ui.S(30)}, 0.4f, 6, (Color){125, 145, 142, 255}); // subscript button
-            DrawTextAligned(ROBOTO_MEDIUM, "X₂", (Rectangle){ui.X(610), ui.Y(410), ui.S(30), ui.S(30)}, ui.S(20), 0.0f, TEXT_DARK, HorizontalAlign::Center, VerticalAlign::Middle);
+            DrawRectangleRounded(subscriptBtn, 0.4f, 6, subscriptBtnClr); // subscript button
+            DrawTextAligned(ROBOTO_MEDIUM, "X₂", subscriptBtn, ui.S(20), 0.0f, TEXT_DARK, HorizontalAlign::Center, VerticalAlign::Middle);
 
-            DrawRectangleRounded((Rectangle){ui.X(650), ui.Y(410), ui.S(70), ui.S(30)}, 0.4f, 6, (Color){125, 145, 142, 255}); // clear button
-            DrawTextAligned(ROBOTO_MEDIUM, "CLEAR", (Rectangle){ui.X(650), ui.Y(410), ui.S(70), ui.S(30)}, ui.S(20), 0.0f, TEXT_DARK, HorizontalAlign::Center, VerticalAlign::Middle);
+            DrawRectangleRounded(clearBtn, 0.4f, 6, clearBtnClr); // clear button
+            DrawTextAligned(ROBOTO_MEDIUM, "CLEAR", clearBtn, ui.S(20), 0.0f, TEXT_DARK, HorizontalAlign::Center, VerticalAlign::Middle);
 
             DrawTextAlignedAt(ROBOTO_MEDIUM, "Molecular Formla", ui.X(600), ui.Y(346), ui.S(24), 0.0f, (Color){102, 129, 127, 255}, HorizontalAlign::Left, VerticalAlign::Bottom);
 
             DrawTextAlignedAt(ROBOTO_MEDIUM, "Recent", ui.X(20), ui.Y(70), ui.S(24), 0.0f, (Color){85, 93, 105, 255}, HorizontalAlign::Left, VerticalAlign::Top);
 
             DrawTextAlignedAt(ROBOTO_BOLD, "Molar Mass Calculator", ui.X(20), ui.Y(30), ui.S(30), 0.0f, (Color){19, 22, 26, 255}, HorizontalAlign::Left, VerticalAlign::Middle);
-            
         EndDrawing();
     }
     
