@@ -7,16 +7,21 @@
 #include "resources/NOTO_SYMBOLS.h"
 #include "resources/ROBOTO_REGULAR.h"
 #include "resources/ROBOTO_MEDIUM.h"
+#include "resources/ROBOTO_BOLD.h"
 
 #define NATIVE_WIDTH 1600
 #define NATIVE_HEIGHT 800
 #define MIN_WIDTH 400
 #define MAX_WIDTH 1600
 
+#define TEXT_LIGHT (Color){225, 244, 242, 255}
+#define TEXT_DARK (Color){71, 83, 82, 255}
+
 Font NOTO_SYMBOLS;
 
 Font ROBOTO_REGULAR;
 Font ROBOTO_MEDIUM;
+Font ROBOTO_BOLD;
 
 void loadFonts();
 
@@ -50,19 +55,32 @@ int main(void) {
             DrawLine((int)ui.X(400), (int)ui.Y(60), (int)ui.X(400), (int)ui.GetHeight(), (Color){58, 62, 66, 255}); // history divider line
 
             DrawRectangleRounded((Rectangle){ui.X(600), ui.Y(350), ui.S(800), ui.S(100)}, 0.24f, 8, (Color){151, 172, 169, 255}); // search box background
-            DrawRectangleRounded((Rectangle){ui.X(1360), ui.Y(410), ui.S(30), ui.S(30)}, 0.4f, 6, (Color){48, 177, 146, 255}); // calculate icon
-            DrawTextAligned(NOTO_SYMBOLS, "➤", (Rectangle){ui.X(1360), ui.Y(410), ui.S(30), ui.S(30)}, 24.0f, 0.0f, WHITE, HorizontalAlign::Center, VerticalAlign::Middle); // replace w/ NHG_REGULAR sometime in the future
-            DrawRectangleRounded((Rectangle){ui.X(1250), ui.Y(410), ui.S(100), ui.S(30)}, 0.4f, 6, (Color){125, 145, 142, 255}); // decimal place
-            DrawTextAligned(ROBOTO_REGULAR, "0.01 C₀₁", (Rectangle){ui.X(1260), ui.Y(410), ui.S(80), ui.S(30)}, 24.0f, 0.0f, WHITE, HorizontalAlign::Left, VerticalAlign::Middle);
-            DrawTextAligned(NOTO_SYMBOLS, "▼", (Rectangle){ui.X(1260), ui.Y(410), ui.S(80), ui.S(30)}, 24.0f, 0.0f, WHITE, HorizontalAlign::Right, VerticalAlign::Middle);
+            DrawRectangleRounded((Rectangle){ui.X(1360), ui.Y(410), ui.S(30), ui.S(30)}, 0.4f, 6, (Color){48, 177, 146, 255}); // calculate background button
+            DrawTextAligned(NOTO_SYMBOLS, "➤", (Rectangle){ui.X(1360), ui.Y(411), ui.S(30), ui.S(30)}, ui.S(32), 0.0f, TEXT_LIGHT, HorizontalAlign::Center, VerticalAlign::Middle); // calculate icon
+            
+            DrawRectangleRounded((Rectangle){ui.X(1250), ui.Y(410), ui.S(100), ui.S(30)}, 0.4f, 6, (Color){125, 145, 142, 255}); // decimal place adjust button
+            DrawTextAligned(ROBOTO_MEDIUM, "0.01", (Rectangle){ui.X(1260), ui.Y(410), ui.S(80), ui.S(30)}, ui.S(20), 0.0f, TEXT_DARK, HorizontalAlign::Left, VerticalAlign::Middle); 
+            DrawTextAligned(NOTO_SYMBOLS, "▼", (Rectangle){ui.X(1260), ui.Y(410), ui.S(80), ui.S(30)}, ui.S(24), 0.0f, TEXT_DARK, HorizontalAlign::Right, VerticalAlign::Bottom);
 
-            DrawTextAlignedAt(ROBOTO_MEDIUM, "Molar Mass Calculator", ui.X(20), ui.Y(30), ui.S(30), 0.0f, GRAY, HorizontalAlign::Left, VerticalAlign::Middle);
+            DrawRectangleRounded((Rectangle){ui.X(610), ui.Y(410), ui.S(30), ui.S(30)}, 0.4f, 6, (Color){125, 145, 142, 255}); // subscript button
+            DrawTextAligned(ROBOTO_MEDIUM, "X₂", (Rectangle){ui.X(610), ui.Y(410), ui.S(30), ui.S(30)}, ui.S(20), 0.0f, TEXT_DARK, HorizontalAlign::Center, VerticalAlign::Middle);
+
+            DrawRectangleRounded((Rectangle){ui.X(650), ui.Y(410), ui.S(70), ui.S(30)}, 0.4f, 6, (Color){125, 145, 142, 255}); // clear button
+            DrawTextAligned(ROBOTO_MEDIUM, "CLEAR", (Rectangle){ui.X(650), ui.Y(410), ui.S(70), ui.S(30)}, ui.S(20), 0.0f, TEXT_DARK, HorizontalAlign::Center, VerticalAlign::Middle);
+
+            DrawTextAlignedAt(ROBOTO_MEDIUM, "Molecular Formla", ui.X(600), ui.Y(346), ui.S(24), 0.0f, (Color){102, 129, 127, 255}, HorizontalAlign::Left, VerticalAlign::Bottom);
+
+            DrawTextAlignedAt(ROBOTO_MEDIUM, "Recent", ui.X(20), ui.Y(70), ui.S(24), 0.0f, (Color){85, 93, 105, 255}, HorizontalAlign::Left, VerticalAlign::Top);
+
+            DrawTextAlignedAt(ROBOTO_BOLD, "Molar Mass Calculator", ui.X(20), ui.Y(30), ui.S(30), 0.0f, (Color){19, 22, 26, 255}, HorizontalAlign::Left, VerticalAlign::Middle);
             
         EndDrawing();
     }
     
+    UnloadFont(NOTO_SYMBOLS);
     UnloadFont(ROBOTO_REGULAR);
     UnloadFont(ROBOTO_MEDIUM);
+    UnloadFont(ROBOTO_BOLD);
     CloseWindow();
     return 0;
 }
@@ -106,14 +124,17 @@ void loadFonts() {
     
     ROBOTO_REGULAR = LoadFontFromMemory(".ttf", font_data_regular, sizeof(font_data_regular), 40, robotoCodepoints, robotoTotalCount);
     ROBOTO_MEDIUM = LoadFontFromMemory(".ttf", font_data_medium, sizeof(font_data_medium), 40, robotoCodepoints, robotoTotalCount);
+    ROBOTO_BOLD = LoadFontFromMemory(".ttf", font_data_bold, sizeof(font_data_bold), 40, robotoCodepoints, robotoTotalCount);
     
     free(robotoCodepoints);
 
     SetTextureFilter(NOTO_SYMBOLS.texture, TEXTURE_FILTER_BILINEAR);
     SetTextureFilter(ROBOTO_REGULAR.texture, TEXTURE_FILTER_BILINEAR);
     SetTextureFilter(ROBOTO_MEDIUM.texture, TEXTURE_FILTER_BILINEAR);
+    SetTextureFilter(ROBOTO_BOLD.texture, TEXTURE_FILTER_BILINEAR);
 
     GenTextureMipmaps(&NOTO_SYMBOLS.texture);
     GenTextureMipmaps(&ROBOTO_REGULAR.texture);
     GenTextureMipmaps(&ROBOTO_MEDIUM.texture);
+    GenTextureMipmaps(&ROBOTO_BOLD.texture);
 }
