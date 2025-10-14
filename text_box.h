@@ -71,6 +71,8 @@ public:
     void SetFocus(bool focus) { focused = focus; }
     void Clear();
     void ToggleSubscript(bool makeSubscript) { toggleSubscript(makeSubscript); }
+    void SetBounds(Rectangle newBounds) { bounds = newBounds; }
+    void SetFontSize(float size) { fontSize = size; }
 
     bool Contains(Vector2 point) const;
 };

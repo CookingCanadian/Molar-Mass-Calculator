@@ -20,6 +20,7 @@
                 "-lgdi32",
                 "-lwinmm",
                 "-ldwmapi",
+                "-Wl,--subsystem,windows",
                 "-o", "${workspaceFolder}/main.exe"
             ],
 

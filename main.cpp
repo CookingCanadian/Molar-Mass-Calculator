@@ -116,7 +116,7 @@ int main(void) {
             if (formula.empty()) {              
                 return;
             }           
-            
+
             double molarMass = CalculateMolarMass(formula);  
             // add to recent queue
             history.insert(history.begin(), {formula, molarMass});
@@ -161,6 +161,7 @@ int main(void) {
             DrawLine((int)ui.X(400), (int)ui.Y(60), (int)ui.X(400), (int)ui.GetHeight(), (Color){58, 62, 66, 255}); // history divider line
 
             DrawRectangleRounded((Rectangle){ui.X(600), ui.Y(350), ui.S(800), ui.S(100)}, 0.24f, 8, (Color){151, 172, 169, 255}); // search box background
+            DrawTextAligned(ROBOTO_REGULAR, "Tip: Use your arrow keys to quickly switch between subscript and regular numbers", (Rectangle){ui.X(600), ui.Y(460), ui.S(800), ui.S(100)}, ui.S(20), 0.0f, (Color){82, 109, 107, 255}, HorizontalAlign::Center, VerticalAlign::Top);
             DrawRectangleRounded(calculateBtn, 0.4f, 6, calculateBtnClr); // calculate background button
             DrawTextAligned(NOTO_SYMBOLS, "➤", calculateBtn, ui.S(32), 0.0f, TEXT_LIGHT, HorizontalAlign::Center, VerticalAlign::Middle); // calculate icon
             
@@ -180,6 +181,8 @@ int main(void) {
 
             DrawTextAlignedAt(ROBOTO_BOLD, "Molar Mass Calculator", ui.X(20), ui.Y(30), ui.S(30), 0.0f, (Color){50, 56, 66, 255}, HorizontalAlign::Left, VerticalAlign::Middle);
 
+            formulaInput.SetBounds(Rectangle{ui.X(600), ui.Y(350), ui.S(800), ui.S(50)});
+            formulaInput.SetFontSize(ui.S(24));
             formulaInput.Draw();
 
             if (dropdownOpen) { // dropdown menu
