@@ -6,6 +6,7 @@
 #include "window_utils.h"
 #include "ui_context.h"
 #include "text_box.h"
+#include "element_data.h"
 #include "resources/NOTO_SYMBOLS.h"
 #include "resources/ROBOTO_REGULAR.h"
 #include "resources/ROBOTO_MEDIUM.h"
@@ -101,8 +102,19 @@ int main(void) {
         }
         
         // button bindings 
-        ui.AddElement(calculateBtn, []() {
-            printf("calculate pressed\n");
+        ui.AddElement(calculateBtn, [&formulaInput, &selectedDecimal]() {
+            std::string formula = formulaInput.GetText();            
+            if (formula.empty()) {              
+                return;
+            }
+            
+            double molarMass = CalculateMolarMass(formula);
+            
+            // format based on decimal precision selection
+            const char* formatStr[] = {"%.1f", "%.2f", "%.3f"};
+            
+            printf("Formula: %s\n", formula.c_str());
+            printf("Molar Mass: %s g/mol\n", TextFormat(formatStr[selectedDecimal], molarMass));
         });
         ui.AddElement(subscriptBtn, [&formulaInput]() {
             formulaInput.ToggleSubscript(true);

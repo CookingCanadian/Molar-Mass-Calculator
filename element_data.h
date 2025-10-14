@@ -11,4 +11,6 @@ struct Element {
 
 const std::vector<Element>& GetPeriodicTable();
 
+double CalculateMolarMass(const std::string& formula);
+
 const Element* FindElementBySymbol(const std::string& symbol);

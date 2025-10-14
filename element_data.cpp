@@ -1,5 +1,76 @@
 #include "element_data.h"
 #include <algorithm>
+#include <cctype>
+#include <cstdlib>
+
+
+struct MoleculeComponent {
+    std::string element;
+    int count;
+};
+
+double CalculateMolarMass(const std::string& formula) {
+    std::vector<MoleculeComponent> components;
+    int i = 0;
+    int leadingMultiplier = 1;
+    
+    // parse leading number
+    if (std::isdigit(formula[0])) {
+        leadingMultiplier = 0;
+        while (i < formula.length() && std::isdigit(formula[i])) {
+            leadingMultiplier = leadingMultiplier * 10 + (formula[i] - '0');
+            i++;
+        }
+    }
+    
+    // parse element symbols and their counts
+    while (i < formula.length()) {
+        // skip whitespace
+        if (std::isspace(formula[i])) {
+            i++;
+            continue;
+        }
+    
+        // parse element symbol
+        if (std::isupper(formula[i])) {
+            std::string element;
+            element += formula[i];
+            i++;
+            
+            while (i < formula.length() && std::islower(formula[i])) {
+                element += formula[i];
+                i++;
+            }            
+
+            int count = 1;
+            if (i < formula.length() && (std::isdigit(formula[i]) || (i + 1 < formula.length() && formula[i] == '_' && std::isdigit(formula[i + 1])))) {             
+                count = 0;
+                while (i < formula.length() && std::isdigit(formula[i])) {
+                    count = count * 10 + (formula[i] - '0');
+                    i++;
+                }
+            }
+            
+            components.push_back({element, count});
+        } else {
+            i++; // skip unknown characters
+        }
+    }
+    
+    // calculate total molar mass
+    double totalMass = 0.0;
+    
+    for (const auto& comp : components) {
+        const Element* elem = FindElementBySymbol(comp.element);
+        if (elem) {
+            totalMass += elem->molarMass * comp.count * leadingMultiplier;
+        } else {
+            printf("Warning: Element '%s' not found\n", comp.element.c_str());
+        }
+    }
+    
+    return totalMass;
+}
 
 const std::vector<Element>& GetPeriodicTable() {
     static std::vector<Element> periodicTable = {
