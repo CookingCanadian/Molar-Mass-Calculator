@@ -9,15 +9,30 @@ struct MoleculeComponent {
     int count;
 };
 
+// helper to convert UTF-8 subscript to digit
+int utf8SubscriptToDigit(const std::string& str, size_t& pos) {
+    if (pos + 2 < str.length() && 
+        (unsigned char)str[pos] == 0xE2 && 
+        (unsigned char)str[pos + 1] == 0x82) {
+        
+        unsigned char third = (unsigned char)str[pos + 2];
+        if (third >= 0x80 && third <= 0x89) {
+            pos += 3;
+            return third - 0x80; // 0-9
+        }
+    }
+    return -1;
+}
+
 double CalculateMolarMass(const std::string& formula) {
     std::vector<MoleculeComponent> components;
-    int i = 0;
+    size_t i = 0;
     int leadingMultiplier = 1;
     
-    // parse leading number
-    if (std::isdigit(formula[0])) {
+    // parse leading number (e.g., 2H2O)
+    if (i < formula.length() && std::isdigit((unsigned char)formula[i])) {
         leadingMultiplier = 0;
-        while (i < formula.length() && std::isdigit(formula[i])) {
+        while (i < formula.length() && std::isdigit((unsigned char)formula[i])) {
             leadingMultiplier = leadingMultiplier * 10 + (formula[i] - '0');
             i++;
         }
@@ -26,26 +41,38 @@ double CalculateMolarMass(const std::string& formula) {
     // parse element symbols and their counts
     while (i < formula.length()) {
         // skip whitespace
-        if (std::isspace(formula[i])) {
+        if (std::isspace((unsigned char)formula[i])) {
             i++;
             continue;
         }
     
-        // parse element symbol
-        if (std::isupper(formula[i])) {
+        // parse element symbol (uppercase + optional lowercase)
+        if (std::isupper((unsigned char)formula[i])) {
             std::string element;
             element += formula[i];
             i++;
             
-            while (i < formula.length() && std::islower(formula[i])) {
+            while (i < formula.length() && std::islower((unsigned char)formula[i])) {
                 element += formula[i];
                 i++;
             }            
-
+    
+            // parse count/subscript
             int count = 1;
-            if (i < formula.length() && (std::isdigit(formula[i]) || (i + 1 < formula.length() && formula[i] == '_' && std::isdigit(formula[i + 1])))) {             
+            
+            // check for UTF-8 subscript digits
+            int subscriptDigit = utf8SubscriptToDigit(formula, i);
+            if (subscriptDigit >= 0) {
+                count = subscriptDigit;
+                // parse additional subscript digits
+                while ((subscriptDigit = utf8SubscriptToDigit(formula, i)) >= 0) {
+                    count = count * 10 + subscriptDigit;
+                }
+            }
+            // check for ASCII digits
+            else if (i < formula.length() && std::isdigit((unsigned char)formula[i])) {
                 count = 0;
-                while (i < formula.length() && std::isdigit(formula[i])) {
+                while (i < formula.length() && std::isdigit((unsigned char)formula[i])) {
                     count = count * 10 + (formula[i] - '0');
                     i++;
                 }

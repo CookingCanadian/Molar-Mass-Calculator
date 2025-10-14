@@ -111,13 +111,13 @@ int main(void) {
         
         // button bindings 
         ui.AddElement(calculateBtn, [&formulaInput, &selectedDecimal, &history]() {
-            std::string formula = formulaInput.GetFormattedText();      
+            std::string formula = formulaInput.GetFormattedText();              
+           
             if (formula.empty()) {              
                 return;
-            }
+            }           
             
-            double molarMass = CalculateMolarMass(formula);
-            
+            double molarMass = CalculateMolarMass(formula);  
             // add to recent queue
             history.insert(history.begin(), {formula, molarMass});
             if (history.size() > MAX_HISTORY) {
@@ -126,9 +126,6 @@ int main(void) {
             
             // format based on decimal precision selection
             const char* formatStr[] = {"%.1f", "%.2f", "%.3f"};
-            
-            printf("Formula: %s\n", formula.c_str());
-            printf("Molar Mass: %s g/mol\n", TextFormat(formatStr[selectedDecimal], molarMass));
         });
         ui.AddElement(subscriptBtn, [&formulaInput]() {
             formulaInput.ToggleSubscript(true);
@@ -179,9 +176,9 @@ int main(void) {
 
             DrawTextAlignedAt(ROBOTO_MEDIUM, "Molecular Formla", ui.X(600), ui.Y(346), ui.S(24), 0.0f, (Color){102, 129, 127, 255}, HorizontalAlign::Left, VerticalAlign::Bottom);
 
-            DrawTextAlignedAt(ROBOTO_MEDIUM, "Recent", ui.X(20), ui.Y(70), ui.S(24), 0.0f, (Color){85, 93, 105, 255}, HorizontalAlign::Left, VerticalAlign::Top);
+            DrawTextAlignedAt(ROBOTO_BOLD, "Recent Data", ui.X(20), ui.Y(70), ui.S(24), 0.0f, (Color){81, 91, 110, 255}, HorizontalAlign::Left, VerticalAlign::Top);
 
-            DrawTextAlignedAt(ROBOTO_BOLD, "Molar Mass Calculator", ui.X(20), ui.Y(30), ui.S(30), 0.0f, (Color){19, 22, 26, 255}, HorizontalAlign::Left, VerticalAlign::Middle);
+            DrawTextAlignedAt(ROBOTO_BOLD, "Molar Mass Calculator", ui.X(20), ui.Y(30), ui.S(30), 0.0f, (Color){50, 56, 66, 255}, HorizontalAlign::Left, VerticalAlign::Middle);
 
             formulaInput.Draw();
 
