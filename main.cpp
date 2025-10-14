@@ -30,6 +30,11 @@ Font ROBOTO_BOLD;
 
 void loadFonts();
 
+struct CalculationHistory {
+    std::string formula;
+    double molarMass;
+};
+
 int main(void) {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_MSAA_4X_HINT | FLAG_WINDOW_UNDECORATED);
     InitWindow(NATIVE_WIDTH, NATIVE_HEIGHT, "Molar Mass Calculator");
@@ -41,6 +46,9 @@ int main(void) {
     
     ui.SetResizeHandle(NATIVE_WIDTH - 20, NATIVE_HEIGHT - 20, 8.0f);
     ui.SetTopBar(60);
+
+    std::vector<CalculationHistory> history;
+    const int MAX_HISTORY = 10;
 
     loadFonts();
 
@@ -102,13 +110,19 @@ int main(void) {
         }
         
         // button bindings 
-        ui.AddElement(calculateBtn, [&formulaInput, &selectedDecimal]() {
-            std::string formula = formulaInput.GetText();            
+        ui.AddElement(calculateBtn, [&formulaInput, &selectedDecimal, &history]() {
+            std::string formula = formulaInput.GetFormattedText();      
             if (formula.empty()) {              
                 return;
             }
             
             double molarMass = CalculateMolarMass(formula);
+            
+            // add to recent queue
+            history.insert(history.begin(), {formula, molarMass});
+            if (history.size() > MAX_HISTORY) {
+                history.pop_back();
+            }
             
             // format based on decimal precision selection
             const char* formatStr[] = {"%.1f", "%.2f", "%.3f"};
@@ -202,6 +216,22 @@ int main(void) {
                     // draw text
                     DrawTextAligned(ROBOTO_MEDIUM, TextFormat("\t%s", decimalValues[i]), dropdownItems[i], ui.S(18), 0.0f, TEXT_DARK, HorizontalAlign::Left, VerticalAlign::Middle);
                 }
+            }
+
+            float historyY = ui.Y(100);
+            for (size_t i = 0; i < history.size(); i++) {            
+                DrawTextAlignedAt(ROBOTO_BOLD, history[i].formula.c_str(), ui.X(20), historyY, ui.S(18), 0.0f, TEXT_LIGHT, HorizontalAlign::Left, VerticalAlign::Top); // formula
+                
+                // get decimal precision for display
+                const char* formatStr[] = {"%.1f", "%.2f", "%.3f"};
+                const char* molarMassStr = TextFormat(formatStr[selectedDecimal], history[i].molarMass);
+                
+                // draw molar mass in medium below formula
+                DrawTextAlignedAt(ROBOTO_MEDIUM, TextFormat("%s g/mol", molarMassStr), ui.X(20), historyY + ui.S(22), ui.S(16), 0.0f, (Color){102, 129, 127, 255}, HorizontalAlign::Left, VerticalAlign::Top);
+                
+                historyY += ui.S(50);
+                
+                DrawLine((int)ui.X(20), (int)historyY - ui.S(8), (int)ui.X(380), (int)historyY - ui.S(8), (Color){58, 62, 66, 255}); // seperator line
             }
         EndDrawing();
     }

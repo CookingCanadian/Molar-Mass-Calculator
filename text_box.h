@@ -48,6 +48,21 @@ public:
     
     std::string GetText() const { return rawText; }
     std::vector<FormattedChar> GetFormatted() const { return formatted; }
+    std::string GetFormattedText() const {
+        std::string result;
+        for (const auto& fc : formatted) {
+            if (fc.subscript && std::isdigit(fc.character)) {
+                // convert to UTF-8 subscript
+                result += (char)(0xE2);
+                result += (char)(0x82);
+                result += (char)(0x80 + (fc.character - '0'));
+            } else {
+                result += fc.character;
+            }
+        }
+        return result;
+    }
+    
     bool IsFocused() const { return focused; }
     
     void SetText(const std::string& text);
