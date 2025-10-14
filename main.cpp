@@ -41,7 +41,7 @@ int main(void) {
     ui.SetResizeHandle(NATIVE_WIDTH - 20, NATIVE_HEIGHT - 20, 8.0f);
     ui.SetTopBar(60);
 
-    loadFonts();  
+    loadFonts();
 
     TextBox formulaInput(
         Rectangle{ui.X(600), ui.Y(350), ui.S(800), ui.S(50)}, 
@@ -50,48 +50,82 @@ int main(void) {
         ui.S(24)
     );
     formulaInput.SetPlaceholder("Enter molecular formula...");
-    formulaInput.SetColors( 
+    formulaInput.SetColors(
         TEXT_LIGHT,                  
         (Color){120, 140, 135, 255}   
     );
+
+    // dropdown state
+    bool dropdownOpen = false;
+    int selectedDecimal = 1; // 0: 0.1, 1: 0.01, 2: 0.001
+    const char* decimalValues[] = {"0.1", "0.01", "0.001"};
 
     while (!WindowShouldClose()) {
         ui.Update();      
         formulaInput.Update();
         
-        BeginDrawing();            
-            // button coordinates
-            Rectangle calculateBtn = {ui.X(1360), ui.Y(410), ui.S(30), ui.S(30)};
-            Rectangle decimalBtn = {ui.X(1250), ui.Y(410), ui.S(100), ui.S(30)};
-            Rectangle subscriptBtn = {ui.X(610), ui.Y(410), ui.S(30), ui.S(30)};
-            Rectangle clearBtn = {ui.X(650), ui.Y(410), ui.S(70), ui.S(30)};
-            // button bindings
-            ui.AddElement(calculateBtn, []() {
-                printf("calculate pressed\n");
-            });
-            ui.AddElement(decimalBtn, []() {
-                printf("decimal pressed\n");
-            });
-            ui.AddElement(subscriptBtn, []() {
-                printf("subscript pressed\n");
-            });
-            ui.AddElement(clearBtn, []() {
-                printf("clear pressed\n");
-            });
-            // hover bindings
-            Color calculateBtnClr = (ui.IsMouseOver(calculateBtn))
+        // Button coordinates
+        Rectangle calculateBtn = {ui.X(1360), ui.Y(410), ui.S(30), ui.S(30)};
+        Rectangle decimalBtn = {ui.X(1250), ui.Y(410), ui.S(100), ui.S(30)};
+        Rectangle subscriptBtn = {ui.X(610), ui.Y(410), ui.S(30), ui.S(30)};
+        Rectangle clearBtn = {ui.X(650), ui.Y(410), ui.S(70), ui.S(30)};
+        
+        // Dropdown menu calculations
+        Rectangle dropdownMenu = {decimalBtn.x, decimalBtn.y + decimalBtn.height, decimalBtn.width, 0};
+        float dropdownItemHeight = ui.S(30);
+        dropdownMenu.height = dropdownItemHeight * 3; // 3 items
+        
+        Rectangle dropdownItems[3];
+        for (int i = 0; i < 3; i++) {
+            dropdownItems[i] = {decimalBtn.x, decimalBtn.y + decimalBtn.height + (i * dropdownItemHeight), decimalBtn.width, dropdownItemHeight};
+        }
+
+        // dropdown interactions
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            if (CheckCollisionPointRec(GetMousePosition(), decimalBtn)) {
+                dropdownOpen = !dropdownOpen;
+            } else if (dropdownOpen) {
+                bool itemSelected = false;
+                for (int i = 0; i < 3; i++) {
+                    if (CheckCollisionPointRec(GetMousePosition(), dropdownItems[i])) {
+                        selectedDecimal = i;
+                        dropdownOpen = false;
+                        itemSelected = true;
+                        break;
+                    }
+                }
+                if (!itemSelected) {
+                    dropdownOpen = false;
+                }
+            }
+        }
+        
+        // button bindings 
+        ui.AddElement(calculateBtn, []() {
+            printf("calculate pressed\n");
+        });
+        ui.AddElement(subscriptBtn, [&formulaInput]() {
+            formulaInput.ToggleSubscript(true);
+        });
+        ui.AddElement(clearBtn, [&formulaInput]() {
+            formulaInput.Clear();
+        });
+        
+        // hover bindings
+        Color calculateBtnClr = (ui.IsMouseOver(calculateBtn))
             ? (Color){28, 157, 126, 255}   // hover
             : (Color){48, 177, 146, 255}; // normal
-            Color decimalBtnClr = (ui.IsMouseOver(decimalBtn))
+        Color decimalBtnClr = (ui.IsMouseOver(decimalBtn) || dropdownOpen)
             ? BUTTON_HOVER 
             : BUTTON_NORMAL; 
-            Color subscriptBtnClr = (ui.IsMouseOver(subscriptBtn))
+        Color subscriptBtnClr = (ui.IsMouseOver(subscriptBtn))
             ? BUTTON_HOVER   
             : BUTTON_NORMAL; 
-            Color clearBtnClr = (ui.IsMouseOver(clearBtn))
+        Color clearBtnClr = (ui.IsMouseOver(clearBtn))
             ? BUTTON_HOVER   
             : BUTTON_NORMAL; 
 
+        BeginDrawing();
             ClearBackground((Color){41, 44, 49, 255});
 
             DrawRectangle(0, 0, (int)ui.GetWidth(), (int)ui.S(60), (Color){31, 34, 39, 255}); // top bar
@@ -108,7 +142,7 @@ int main(void) {
             DrawTextAligned(NOTO_SYMBOLS, "➤", calculateBtn, ui.S(32), 0.0f, TEXT_LIGHT, HorizontalAlign::Center, VerticalAlign::Middle); // calculate icon
             
             DrawRectangleRounded(decimalBtn, 0.4f, 6, decimalBtnClr); // decimal place adjust button
-            DrawTextAligned(ROBOTO_MEDIUM, "\t0.01", decimalBtn, ui.S(20), 0.0f, TEXT_DARK, HorizontalAlign::Left, VerticalAlign::Middle); 
+            DrawTextAligned(ROBOTO_MEDIUM, TextFormat("\t%s", decimalValues[selectedDecimal]), decimalBtn, ui.S(20), 0.0f, TEXT_DARK, HorizontalAlign::Left, VerticalAlign::Middle);
             DrawTextAligned(NOTO_SYMBOLS, "▼\t", decimalBtn, ui.S(24), 0.0f, TEXT_DARK, HorizontalAlign::Right, VerticalAlign::Bottom);
 
             DrawRectangleRounded(subscriptBtn, 0.4f, 6, subscriptBtnClr); // subscript button
@@ -124,6 +158,39 @@ int main(void) {
             DrawTextAlignedAt(ROBOTO_BOLD, "Molar Mass Calculator", ui.X(20), ui.Y(30), ui.S(30), 0.0f, (Color){19, 22, 26, 255}, HorizontalAlign::Left, VerticalAlign::Middle);
 
             formulaInput.Draw();
+
+            if (dropdownOpen) { // dropdown menu
+                DrawRectangleRounded(dropdownMenu, 0.2f, 6, BUTTON_HOVER); 
+                
+                for (int i = 0; i < 3; i++) {
+                    Color itemColor = (i == selectedDecimal)
+                        ? BUTTON_NORMAL // selected
+                        : BUTTON_HOVER; // normal
+                    
+                    // draw item background
+                    DrawRectangle(
+                        (int)dropdownItems[i].x, 
+                        (int)dropdownItems[i].y, 
+                        (int)dropdownItems[i].width, 
+                        (int)dropdownItems[i].height, 
+                        itemColor
+                    );
+                    
+                    // draw hover effect
+                    if (CheckCollisionPointRec(GetMousePosition(), dropdownItems[i])) {
+                        DrawRectangle(
+                            (int)dropdownItems[i].x, 
+                            (int)dropdownItems[i].y, 
+                            (int)dropdownItems[i].width, 
+                            (int)dropdownItems[i].height, 
+                            BUTTON_NORMAL
+                        );
+                    }
+                    
+                    // draw text
+                    DrawTextAligned(ROBOTO_MEDIUM, TextFormat("\t%s", decimalValues[i]), dropdownItems[i], ui.S(18), 0.0f, TEXT_DARK, HorizontalAlign::Left, VerticalAlign::Middle);
+                }
+            }
         EndDrawing();
     }
     

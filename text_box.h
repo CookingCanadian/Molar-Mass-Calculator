@@ -37,7 +37,7 @@ private:
     void updateFormatting();
     void insertChar(char c);
     void deleteChar();
-    void backspace();
+    void backspace();    
     void toggleSubscript(bool makeSubscript);
     
 public:
@@ -55,6 +55,7 @@ public:
     void SetColors(Color text, Color placeholderCol);
     void SetFocus(bool focus) { focused = focus; }
     void Clear();
+    void ToggleSubscript(bool makeSubscript) { toggleSubscript(makeSubscript); }
 
     bool Contains(Vector2 point) const;
 };
