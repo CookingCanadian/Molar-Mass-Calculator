@@ -5,6 +5,7 @@
 #include "text_align.h"
 #include "window_utils.h"
 #include "ui_context.h"
+#include "text_box.h"
 #include "resources/NOTO_SYMBOLS.h"
 #include "resources/ROBOTO_REGULAR.h"
 #include "resources/ROBOTO_MEDIUM.h"
@@ -40,12 +41,25 @@ int main(void) {
     ui.SetResizeHandle(NATIVE_WIDTH - 20, NATIVE_HEIGHT - 20, 8.0f);
     ui.SetTopBar(60);
 
-    loadFonts();
+    loadFonts();  
+
+    TextBox formulaInput(
+        Rectangle{ui.X(600), ui.Y(350), ui.S(800), ui.S(50)}, 
+        ROBOTO_MEDIUM,
+        ROBOTO_MEDIUM,  
+        ui.S(24)
+    );
+    formulaInput.SetPlaceholder("Enter molecular formula...");
+    formulaInput.SetColors( 
+        TEXT_LIGHT,                  
+        (Color){120, 140, 135, 255}   
+    );
 
     while (!WindowShouldClose()) {
-        ui.Update();        
+        ui.Update();      
+        formulaInput.Update();
         
-        BeginDrawing();
+        BeginDrawing();            
             // button coordinates
             Rectangle calculateBtn = {ui.X(1360), ui.Y(410), ui.S(30), ui.S(30)};
             Rectangle decimalBtn = {ui.X(1250), ui.Y(410), ui.S(100), ui.S(30)};
@@ -108,6 +122,8 @@ int main(void) {
             DrawTextAlignedAt(ROBOTO_MEDIUM, "Recent", ui.X(20), ui.Y(70), ui.S(24), 0.0f, (Color){85, 93, 105, 255}, HorizontalAlign::Left, VerticalAlign::Top);
 
             DrawTextAlignedAt(ROBOTO_BOLD, "Molar Mass Calculator", ui.X(20), ui.Y(30), ui.S(30), 0.0f, (Color){19, 22, 26, 255}, HorizontalAlign::Left, VerticalAlign::Middle);
+
+            formulaInput.Draw();
         EndDrawing();
     }
     
